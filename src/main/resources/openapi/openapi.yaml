@@ -320,7 +320,7 @@ components:
           type: number
           format: float
           description: Цена товара (> 0)
-          minimum: 0.01
+          minimum: 0.0099
           example: 1499.99
         stock:
           type: integer
@@ -378,7 +378,7 @@ components:
           type: number
           format: float
           description: Цена товара (> 0)
-          minimum: 0.01
+          minimum: 0.0099
           example: 1499.99
         stock:
           type: integer
@@ -423,7 +423,7 @@ components:
           type: number
           format: float
           description: Цена товара (> 0)
-          minimum: 0.01
+          minimum: 0.0099
           example: 1499.99
         stock:
           type: integer

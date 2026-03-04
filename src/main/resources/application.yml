@@ -3,6 +3,9 @@ spring:
     url: jdbc:postgresql://localhost:5432/demo_db
     username: postgres
     password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: validate
   flyway:
     enabled: true
     locations: classpath:db/migration

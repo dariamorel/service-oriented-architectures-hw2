@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.OffsetDateTime
-import java.util.NoSuchElementException
 
 @RestController
 class ProductController(
@@ -31,7 +30,7 @@ class ProductController(
 
     @Transactional(readOnly = true)
     override fun getProductById(id: Long): ResponseEntity<ProductResponse> {
-        val entity = productRepository.findById(id).orElseThrow { NoSuchElementException("Product with id $id not found") }
+        val entity = productRepository.findById(id).orElseThrow { ProductNotFoundException(id) }
         return ResponseEntity.ok(toResponse(entity))
     }
 
@@ -58,7 +57,7 @@ class ProductController(
 
     @Transactional
     override fun updateProduct(id: Long, productUpdate: ProductUpdate): ResponseEntity<ProductResponse> {
-        val entity = productRepository.findById(id).orElseThrow { NoSuchElementException("Product with id $id not found") }
+        val entity = productRepository.findById(id).orElseThrow { ProductNotFoundException(id) }
         applyToEntity(entity, productUpdate.name, productUpdate.description, productUpdate.price, productUpdate.stock, productUpdate.category, productUpdate.status)
         entity.updatedAt = OffsetDateTime.now()
         return ResponseEntity.ok(toResponse(productRepository.save(entity)))
@@ -66,7 +65,7 @@ class ProductController(
 
     @Transactional
     override fun deleteProduct(id: Long): ResponseEntity<Unit> {
-        val entity = productRepository.findById(id).orElseThrow { NoSuchElementException("Product with id $id not found") }
+        val entity = productRepository.findById(id).orElseThrow { ProductNotFoundException(id) }
         entity.status = ProductStatus.ARCHIVED.value
         productRepository.save(entity)
         return ResponseEntity.noContent().build()

@@ -4,6 +4,22 @@ info:
   title: Product API
   description: |
     OpenAPI-спецификация для сущности Product
+
+    #### Каталог error codes:
+
+    | Код ошибки | HTTP-статус | Когда возвращается |
+    |------------|-------------|---------------------|
+    | PRODUCT_NOT_FOUND | 404 | Товар не найден по ID |
+    | PRODUCT_INACTIVE | 409 | Попытка заказать неактивный товар |
+    | ORDER_NOT_FOUND | 404 | Заказ не найден по ID |
+    | ORDER_LIMIT_EXCEEDED | 429 | Превышен лимит частоты создания/обновления заказа |
+    | ORDER_HAS_ACTIVE | 409 | У пользователя уже есть активный заказ |
+    | INVALID_STATE_TRANSITION | 409 | Недопустимый переход состояния заказа |
+    | INSUFFICIENT_STOCK | 409 | Недостаточно товара на складе |
+    | PROMO_CODE_INVALID | 422 | Промокод не найден, истёк, исчерпан или неактивен |
+    | PROMO_CODE_MIN_AMOUNT | 422 | Сумма заказа ниже минимальной для промокода |
+    | ORDER_OWNERSHIP_VIOLATION | 403 | Заказ принадлежит другому пользователю |
+    | VALIDATION_ERROR | 400 | Ошибка валидации входных данных |
   version: 1.0.0
 
 servers:
@@ -76,6 +92,15 @@ paths:
                 totalElements: 1
                 page: 0
                 size: 20
+        '400':
+          description: Ошибка валидации входных данных
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error_code: "VALIDATION_ERROR"
+                message: "Field 'page' is required"
 
     post:
       summary: Создание товара
@@ -103,13 +128,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProductResponse'
         '400':
-          description: Неверный формат запроса
+          description: Ошибка валидации входных данных
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                code: "VALIDATION_ERROR"
+                error_code: "VALIDATION_ERROR"
                 message: "Field 'name' is required"
 
   /products/{id}:
@@ -134,14 +159,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProductResponse'
-        '404':
-          description: Товар не найден
+        '400':
+          description: Ошибка валидации входных данных
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                code: "NOT_FOUND"
+                error_code: "VALIDATION_ERROR"
+                message: "Field 'id' is required"
+        '404':
+          description: Товар не найден по ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error_code: "PRODUCT_NOT_FOUND"
                 message: "Product with id 999 not found"
 
     put:
@@ -176,12 +210,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProductResponse'
-        '404':
-          description: Товар не найден
+        '400':
+          description: Ошибка валидации входных данных
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error_code: "VALIDATION_ERROR"
+                message: "Field 'id' is required"
+        '404':
+          description: Товар не найден по ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error_code: "PRODUCT_NOT_FOUND"
+                message: "Product with id 999 not found"
 
     delete:
       summary: Мягкое удаление товара
@@ -200,12 +246,24 @@ paths:
       responses:
         '204':
           description: Продукт удален (тело ответа пустое)
-        '404':
-          description: Товар не найден
+        '400':
+          description: Ошибка валидации входных данных
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+              example:
+                error_code: "VALIDATION_ERROR"
+                message: "Field 'id' is required"
+        '404':
+          description: Товар не найден по ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error_code: "PRODUCT_NOT_FOUND"
+                message: "Product with id 999 not found"
 
 components:
   schemas:
@@ -393,14 +451,20 @@ components:
     Error:
       type: object
       required:
-        - code
+        - error_code
         - message
       properties:
-        code:
-          type: string
-          description: Машинночитаемый код ошибки
-          example: "VALIDATION_ERROR"
+        error_code:
+          $ref: '#/components/schemas/ErrorCode'
         message:
           type: string
-          description: Описание ошибки для человека
+          description: Человекочитаемое описание
           example: "Field 'name' is required"
+        details:
+          type: object
+          description: Детали ошибки
+
+    ErrorCode:
+      type: string
+      description: Машинночитаемый код ошибки
+      enum: [PRODUCT_NOT_FOUND, PRODUCT_INACTIVE, ORDER_NOT_FOUND, ORDER_LIMIT_EXCEEDED, ORDER_HAS_ACTIVE, INVALID_STATE_TRANSITION, INSUFFICIENT_STOCK, PROMO_CODE_INVALID, PROMO_CODE_MIN_AMOUNT, ORDER_OWNERSHIP_VIOLATION, VALIDATION_ERROR, ]  

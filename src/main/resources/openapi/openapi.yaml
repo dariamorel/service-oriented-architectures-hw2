@@ -31,7 +31,7 @@ paths:
             type: integer
             format: int32
             minimum: 0
-            default: 0 
+            default: 0
         - name: size
           in: query
           description: Размер страницы
@@ -61,19 +61,21 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ProductsListResponse'
+                $ref: '#/components/schemas/ProductListResponse'
               example:
-                - id: 1
-                  name: "Дорожный утюг"
-                  description: "Компактный утюг. Подойдет для поездок."
-                  price: 1499.99
-                  stock: 50
-                  category: "Бытовая техника"
-                  status: ACTIVE
-                  created_at: "2026-03-04T10:00:00Z"
-                  updated_at: "2026-03-04T10:00:00Z"
+                content:
+                  - id: 1
+                    name: "Дорожный утюг"
+                    description: "Компактный утюг. Подойдет для поездок."
+                    price: 1499.99
+                    stock: 50
+                    category: "Бытовая техника"
+                    status: ACTIVE
+                    created_at: "2026-03-04T10:00:00Z"
+                    updated_at: "2026-03-04T10:00:00Z"
+                totalElements: 1
+                page: 0
+                size: 20
 
     post:
       summary: Создание товара
@@ -296,7 +298,7 @@ components:
         - category
         - status
         - created_at
-        - updated_at   
+        - updated_at
 
     ProductCreate:
       type: object
@@ -387,7 +389,7 @@ components:
         - stock
         - category
         - status
-    
+
     Error:
       type: object
       required:

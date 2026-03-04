@@ -27,3 +27,12 @@ replay_pid*
 .kotlin/
 
 .idea/
+
+# Generated sources
+target/
+generated/
+**/generated-sources/
+
+# Gradle
+.gradle/
+build/

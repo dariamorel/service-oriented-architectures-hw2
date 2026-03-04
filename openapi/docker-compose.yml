@@ -6,4 +6,4 @@ services:
     environment:
       SWAGGER_JSON: /spec/openapi.yaml
     volumes:
-      - ./openapi.yaml:/spec/openapi.yaml:ro
+      - ../src/main/resources/openapi/openapi.yaml:/spec/openapi.yaml:ro

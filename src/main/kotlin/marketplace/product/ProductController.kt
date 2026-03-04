@@ -17,7 +17,7 @@ import java.time.OffsetDateTime
 import java.util.NoSuchElementException
 
 @RestController
-class ProductService(
+class ProductController(
     private val productRepository: ProductRepository
 ) : ProductsApi {
 
@@ -68,7 +68,6 @@ class ProductService(
     override fun deleteProduct(id: Long): ResponseEntity<Unit> {
         val entity = productRepository.findById(id).orElseThrow { NoSuchElementException("Product with id $id not found") }
         entity.status = ProductStatus.ARCHIVED.value
-        entity.updatedAt = OffsetDateTime.now()
         productRepository.save(entity)
         return ResponseEntity.noContent().build()
     }

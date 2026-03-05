@@ -1,0 +1,79 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.9.25'
+    id 'org.jetbrains.kotlin.plugin.spring' version '1.9.25'
+    id 'org.jetbrains.kotlin.plugin.jpa' version '1.9.25'
+    id 'org.springframework.boot' version '3.3.4'
+    id 'io.spring.dependency-management' version '1.1.6'
+    id 'org.openapi.generator' version '7.7.0'
+}
+
+group = 'marketplace'
+version = '1.0.0-SNAPSHOT'
+
+kotlin {
+    jvmToolchain(17)
+}
+
+springBoot {
+    mainClass = 'marketplace.MarketplaceApplication'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.jetbrains.kotlin:kotlin-reflect'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    implementation 'org.flywaydb:flyway-core'
+    implementation 'org.flywaydb:flyway-database-postgresql'
+    runtimeOnly 'org.postgresql:postgresql'
+    implementation 'io.swagger.core.v3:swagger-annotations-jakarta:2.2.23'
+    implementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
+    compileOnly 'jakarta.servlet:jakarta.servlet-api:6.0.0'
+    implementation 'org.openapitools:jackson-databind-nullable:0.2.6'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+openApiGenerate {
+    generatorName = 'kotlin-spring'
+    inputSpec = "$projectDir/src/main/resources/openapi/openapi.yaml"
+    outputDir = "$buildDir/generated"
+    apiPackage = 'marketplace.api'
+    modelPackage = 'marketplace.model'
+    generateApiTests = false
+    generateModelTests = false
+    generateApiDocumentation = false
+    generateModelDocumentation = false
+    configOptions = [
+            interfaceOnly        : 'true',
+            useSpringBoot3       : 'true',
+            performBeanValidation: 'true',
+            openApiNullable      : 'false',
+            dateLibrary          : 'java8',
+            useTags              : 'true',
+            useBeanValidation    : 'true'
+    ]
+}
+
+sourceSets {
+    main {
+        kotlin {
+            srcDir "$buildDir/generated/src/main/kotlin"
+        }
+    }
+}
+
+tasks.named('compileKotlin') {
+    dependsOn tasks.named('openApiGenerate')
+}
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+}
